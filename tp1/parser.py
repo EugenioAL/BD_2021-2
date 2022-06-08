@@ -46,7 +46,7 @@ def splitByLine(dataText,productList,grupoList,reviwsList,categoriasList,similar
     tmpProduct.id = int(dataLines[0])
     #print("Produto id:\t",tmpProduct.id)
     Lista = dataLines[1].split("ASIN: ",-1)
-    tmpProduct.asin = int(Lista[1])
+    tmpProduct.asin = Lista[1]
     #print("Produto asin:\t",tmpProduct.asin)
     Lista =  dataLines[2].split("title: ",-1)
     if(len(Lista) > 1):
@@ -75,7 +75,7 @@ def parser():
     categorias = []
     similares = []
 
-    with open('ptest.txt') as file:
+    with open('amazon-meta.txt', encoding='latin-1') as file:
         file_contents = file.read()
         file_split_by_id = file_contents.split('Id:   ',-1)
     
