@@ -31,17 +31,6 @@ class Reviews:
         self.votes = 0
         self.helpf = 0
 
-def splitBySpace(dataText, productList,grupoList,reviwsList,categoriasList,similarList):
-    dataLines = dataText.split(' ', -1)
-    i = 0
-    #while (i < len(dataLines)):
-     #   if(dataLines[i] == ' '):
-      #      del dataLines[i]
-       # else:
-        #    i+=1
-    print(dataLines)
-    return dataLines
-
 def splitByLine(dataText,productList,grupoList,reviwsList,categoriasList,similarList):
     tmpProduct = Product()
     tmpGrupos = Grupo()
@@ -51,27 +40,29 @@ def splitByLine(dataText,productList,grupoList,reviwsList,categoriasList,similar
     Lista = []
     
     dataLines = dataText.split('\n', -1)
-    for i in range(len(dataLines)):
-        print(  "linha:\t",i)
-        print(dataLines[i])
+    #for i in range(len(dataLines)):
+        #print(  "linha:\t",i)
+        #print(dataLines[i])
     tmpProduct.id = int(dataLines[0])
-    print("Produto id:\t",tmpProduct.id)
+    #print("Produto id:\t",tmpProduct.id)
     Lista = dataLines[1].split("ASIN: ",-1)
     tmpProduct.asin = int(Lista[1])
-    print("Produto asin:\t",tmpProduct.asin)
+    #print("Produto asin:\t",tmpProduct.asin)
     Lista =  dataLines[2].split("title: ",-1)
     if(len(Lista) > 1):
         tmpProduct.title = Lista[1]
-        print("Produto titulo:\t",tmpProduct.title)
+        #print("Produto titulo:\t",tmpProduct.title)
         Lista =  dataLines[3].split("group: ",-1)
         tmpGrupos.nome = Lista[1]
-        print("Grupo:\t\t",tmpGrupos.nome)
+        #print("Grupo:\t\t",tmpGrupos.nome)
         Lista =  dataLines[4].split("salesrank: ",-1)
         tmpProduct.salesrank = int(Lista[1])
-        print("Salesrank:\t",tmpProduct.salesrank)
+        #print("Salesrank:\t",tmpProduct.salesrank)
+        productList.append(tmpProduct)
     else:
         tmpProduct.title = Lista[0]
-        print("Produto titulo:\t",tmpProduct.title)
+        productList.append(tmpProduct)
+        #print("Produto titulo:\t",tmpProduct.title)
 
 
 
@@ -93,6 +84,9 @@ def parser():
     while(i < len(file_split_by_id)):
         splitByLine(file_split_by_id[i],tmpProduct, customer, reviews,categorias,similares)
         i+=1
+
+    for i in range(len(tmpProduct)):
+        print(tmpProduct[i].title)
 
     #fr = "|Books[283155]|Subjects[1000]|Religion & Spirituality[22]|Christianity[12290]|Clergy[12360]|Preaching[12368]"
     #fd = fr.split('|',-1)
