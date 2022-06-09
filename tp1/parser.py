@@ -59,6 +59,17 @@ def splitByLine(dataText,productList,grupoList,reviwsList,categoriasList,similar
         tmpProduct.salesrank = int(Lista[1])
         #print("Salesrank:\t",tmpProduct.salesrank)
         productList.append(tmpProduct)
+        Lista = dataLines[5].split("similar: ")
+        Lista = Lista[1].split("  ",-1)
+        simQt = int(Lista[0])
+        tmpSimilar.asin = tmpProduct.asin
+        i = 1
+        tmpLista = []
+        print(Lista)
+        while(i <= simQt):
+            similarList.append(Similar())
+            similarList[len(similarList)-1].sAsin = Lista[i]
+            i+=1
     else:
         tmpProduct.title = Lista[0]
         productList.append(tmpProduct)
