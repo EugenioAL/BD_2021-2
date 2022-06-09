@@ -1,3 +1,6 @@
+from typing import List
+
+
 class Product:
     def __init__(self):
         self.id = 0
@@ -9,8 +12,8 @@ class Product:
 
 class Similar:
     def __init__(self):
-        self.product_id = 0
-        self.product_tog_id = 0
+        self.asin = 0
+        self.sAsin = 0
 
 class Grupo:
     def __init__(self) -> None:
@@ -24,14 +27,14 @@ class Categorias:
         self.subcat_id = 0
 class Reviews:
     def __init__(self):
-        self.product_asin = ""
+        self.asin = ""
         self.date = ""
         self.customer_id = 0
         self.rating = 0
         self.votes = 0
         self.helpf = 0
 
-def splitByLine(dataText,productList,grupoList,reviwsList,categoriasList,similarList):
+def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,similarList):
     tmpProduct = Product()
     tmpGrupos = Grupo()
     tmpReviews = Reviews()
@@ -64,12 +67,22 @@ def splitByLine(dataText,productList,grupoList,reviwsList,categoriasList,similar
         simQt = int(Lista[0])
         tmpSimilar.asin = tmpProduct.asin
         i = 1
-        tmpLista = []
-        print(Lista)
+        #print(Lista)
         while(i <= simQt):
             similarList.append(Similar())
             similarList[len(similarList)-1].sAsin = Lista[i]
             i+=1
+        Lista = dataLines[6].split("categories: ",-1)
+        catQt = int(Lista[1])
+        x = 6 + catQt+1
+        Lista = dataLines[x].split("reviews: total: ",-1)
+        Lista = Lista[1].split("  ",-1)
+        reviewsQt = int(Lista[0])
+        finalLine = reviewsQt + x
+        x += 1
+        print(Lista)
+        print(reviewsQt)
+
     else:
         tmpProduct.title = Lista[0]
         productList.append(tmpProduct)
@@ -86,7 +99,7 @@ def parser():
     categorias = []
     similares = []
 
-    with open('amazon-meta.txt', encoding='latin-1') as file:
+    with open('ptest.txt', encoding='latin-1') as file:
         file_contents = file.read()
         file_split_by_id = file_contents.split('Id:   ',-1)
     
@@ -95,9 +108,14 @@ def parser():
     while(i < len(file_split_by_id)):
         splitByLine(file_split_by_id[i],tmpProduct, customer, reviews,categorias,similares)
         i+=1
+    #for i in range(len(tmpProduct)):
+    #    print(tmpProduct[i].title)
 
-    for i in range(len(tmpProduct)):
-        print(tmpProduct[i].title)
+    #for i in range(len(similares)):
+    #    print(similares[i].sAsin)
+
+    for i in range(len(reviews)):
+        print(reviews[i].data)
 
     #fr = "|Books[283155]|Subjects[1000]|Religion & Spirituality[22]|Christianity[12290]|Clergy[12360]|Preaching[12368]"
     #fd = fr.split('|',-1)
