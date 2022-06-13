@@ -1,0 +1,11 @@
+services:
+  database:
+    images: postgres
+    ports:
+      -5432:5432
+    restart: always
+
+    enviroment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: metadb

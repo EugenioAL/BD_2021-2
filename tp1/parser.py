@@ -77,16 +77,20 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
         catQt = int(Lista[1])
         i = 1
         while(i <= catQt):
-            Lista = re.findall(r'[a-z &\-A-Z]+', dataLines[6+i])
+            Lista = re.findall(r'[ña-z &,:\'.()\-A-Z]+', dataLines[6+i])
             Lista.pop(0)
             x = len(Lista)
             Lista2 = re.findall(r'[0-9]+', dataLines[6+i])
             a = 0
+            print(tmpProduct.id)
+            print(Lista)
+            print(Lista2)
             while(a < x):
                 if(a > 0):
                     tmpCategorias.catpai = Lista[a-1]
                     tmpCategorias.catpai_id = int(Lista2[a-1])
                     tmpCategorias.subcat_name = Lista[a]
+                    print('a\t',a,'len\t',len(Lista2),'lenx\t',x)
                     tmpCategorias.subcat_id = int(Lista2[a])
                 else:
                     tmpCategorias.catpai = Lista[a]
@@ -137,7 +141,7 @@ def parser():
     categorias = []
     similares = []
 
-    with open('ptest.txt', encoding='latin-1') as file:
+    with open('amazon-meta.txt', encoding='latin-1') as file:
         file_contents = file.read()
         file_split_by_id = file_contents.split('Id:   ',-1)
     
