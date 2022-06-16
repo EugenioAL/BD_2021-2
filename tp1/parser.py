@@ -62,33 +62,27 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
         tmpSimilar.asin = tmpProduct.asin
         if(simQt > 0):
             i = 1
-            #print(Lista)
             while(i <= simQt):
                 similarList.append(Similar())
                 similarList[len(similarList)-1].sAsin = Lista[i]
                 i+=1
         Lista = dataLines[6].split("categories: ",-1)
         catQt = int(Lista[1])
-        print('id\t',tmpProduct.id)
         if(catQt > 0):
             i = 1
             while(i <= catQt):
                 Lista = dataLines[6+i].split('|',-1)
-                #Lista = re.findall('[^0-9\[\]\|]+', dataLines[6+i])
                 for f in range(len(Lista)):
                     Lista[f] = re.sub('[[0-9]+]','',Lista[f])
                 Lista.pop(0)
                 x = len(Lista)
                 Lista2 = re.findall(r'[0-9]+', dataLines[6+i])
                 a = 0
-                #print(tmpProduct.id)
-                #if(len(Lista) == len(Lista2)):
                 while(a < x):
                     if(a > 0):
                         tmpCategorias.catpai = Lista[a-1]
                         tmpCategorias.catpai_id = int(Lista2[a-1])
                         tmpCategorias.subcat_name = Lista[a]
-                        #print('a\t',a,'len\t',len(Lista2),'lenx\t',x)
                         tmpCategorias.subcat_id = int(Lista2[a])
                     else:
                         tmpCategorias.catpai = Lista[a]
@@ -128,7 +122,6 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
     else:
         tmpProduct.title = Lista[0]
         productList.append(tmpProduct)
-        #print("Produto titulo:\t",tmpProduct.title)
 
 
 
@@ -151,16 +144,8 @@ def parser():
         splitByLine(file_split_by_id[i],tmpProduct, customer, reviews,categorias,similares)
         i+=1
 
-
-    #for i in range(len(categorias)):
-    #    print("CatPai:\t",categorias[i].catpai,"\tSub:\t",categorias[i].subcat_name)
-    #fr = "|Books[283155]|Subjects[1000]|Religion & Spirituality[22]|Christianity[12290]|Clergy[12360]|Preaching[12368]"
-    #fd = fr.split('|',-1)
-
-    
-    #cd = fd[1].split('[',1)
-    
-    #catID = int(''.join(filter(str.isdigit,fd[1])))
+    for i in range(len(tmpProduct)):
+        print(tmpProduct[i].title)
 
 
 
