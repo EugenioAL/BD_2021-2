@@ -1,40 +1,38 @@
-from itertools import count
-from typing import List
 import re
 
 class Product:
     def __init__(self):
-        self.id = 0
-        self.asin = 0
-        self.title = ""
-        self.group = ""
-        self.salesrank = 0
-        self.categoria = ''
+        self.id = None
+        self.asin = None
+        self.title = None
+        self.group = None
+        self.salesrank = None
+        self.categoria = None
 
 class Similar:
     def __init__(self):
-        self.asin = 0
-        self.sAsin = 0
+        self.asin = None
+        self.sAsin = None
 
 class Grupo:
     def __init__(self) -> None:
-        self.nome = ''
+        self.nome = None
 
 
 class Categorias:
     def __init__(self):
-        self.catpai = ""
-        self.catpai_id = 0
-        self.subcat_name = ""
-        self.subcat_id = 0
+        self.catpai = None
+        self.catpai_id = None
+        self.subcat_name = None
+        self.subcat_id = None
 class Reviews:
     def __init__(self):
-        self.asin = ""
-        self.date = ""
-        self.customer_id = 0
-        self.rating = 0
-        self.votes = 0
-        self.helpf = 0
+        self.asin = None
+        self.date = None
+        self.customer_id = None
+        self.rating = None
+        self.votes = None
+        self.helpf = None
 
 def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,similarList):
     tmpProduct = Product()
@@ -77,6 +75,8 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
                 Lista.pop(0)
                 x = len(Lista)
                 Lista2 = re.findall(r'[0-9]+', dataLines[6+i])
+                for f in range(len(Lista2)):
+                    Lista2[f] = int(re.sub('\[\]','',Lista2[f]))
                 a = 0
                 while(a < x):
                     if(a > 0):
@@ -108,9 +108,9 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
                     tmpReviews.asin = tmpProduct.asin
                     tmpReviews.date = Lista[0]
                     tmpReviews.customer_id = Lista[2]
-                    tmpReviews.rating = Lista[4]
-                    tmpReviews.votes = Lista[6]
-                    tmpReviews.helpf = Lista[8]
+                    tmpReviews.rating = int( Lista[4])
+                    tmpReviews.votes = int(Lista[6])
+                    tmpReviews.helpf = int(Lista[8])
                     reviewsList.append(Reviews())
                     reviewsList[len(reviewsList)-1].date = tmpReviews.date
                     reviewsList[len(reviewsList)-1].customer_id = tmpReviews.customer_id
@@ -124,15 +124,14 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
         productList.append(tmpProduct)
 
 
+product = []
+customer = []
+reviews = []
+categorias = []
+similares = []
 
 
-
-def parser():
-    tmpProduct = []
-    customer = []
-    reviews = []
-    categorias = []
-    similares = []
+def parser(prodList,customerList,rebiesList,categoriasList,similaresList):
 
     with open('amazon-meta.txt', encoding='latin-1') as file:
         file_contents = file.read()
@@ -141,13 +140,13 @@ def parser():
     i=1
     
     while(i < len(file_split_by_id)):
-        splitByLine(file_split_by_id[i],tmpProduct, customer, reviews,categorias,similares)
+        splitByLine(file_split_by_id[i],prodList,customerList,rebiesList,categoriasList,similaresList)
         i+=1
 
-    for i in range(len(tmpProduct)):
-        print(tmpProduct[i].title)
+    for i in range(len(prodList)):
+        print(prodList[i].title)
 
 
 
 
-parser()
+parser(product,customer,reviews,categorias,similares)
