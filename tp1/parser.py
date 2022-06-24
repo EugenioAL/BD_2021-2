@@ -1,4 +1,6 @@
+from os import system
 import re
+from sys import stdin
 import psycopg2
 
 class Product:
@@ -91,17 +93,6 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
     else:
         productList.append(Product(id,asin,Lista[0],None,None))
 
-
-product = []
-customer = []
-reviews = []
-categorias = []
-similares = []
-catsProds = []
-
-
-
-
 def parser(prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList):
 
     with open('amazon-meta.txt', encoding='latin-1') as file:
@@ -131,4 +122,37 @@ def parser(prodList,customerList,reviewsList,categoriasList,similaresList,catsPr
         print("Cat ID:\t",catsProdsList[i].cat_id,"PROD asin:",catsProdsList[i].asin)
     """
 
-parser(product,customer,reviews,categorias,similares,catsProds)
+
+product = []
+customer = []
+reviews = []
+categorias = []
+similares = []
+catsProds = []
+def criarTabela(prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList):
+    #db configurações
+    host = 'localhost'
+    dbname = 'amazon'
+    user = 'postgres'
+    password = 'postgres'
+
+    #string de conexão
+
+    conn_string = 'host={0} user={1} dbname={2} password={3}'.format(host, user, dbname, password)
+
+    conn = psycopg2.connect(conn_string)
+
+    
+
+    cursor = conn.cursor()
+    cursor.execute('CREATE TABLE IF NOT EXISTS produto(asin VARCHAR (20) PRIMARY KEY,id INT UNIQUE,title VARCHAR (100), salesrank INT,grupo VARCHAR(20));')
+    cursor.execute('CREATE TABLE IF NOT EXISTS similares(asin VARCHAR(20),asin_sim VARCHAR(20),PRIMARY KEY (asin, asin_sim), FOREIGN KEY (asin) REFERENCES produto(asin))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS review(id INT PRIMARY KEY,asin VARCHAR(20),customer VARCHAR(20),rating INT, date DATE, votes INT, helpful INT,FOREIGN KEY (asin) REFERENCES produto(asin))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS categoria(id INT PRIMARY KEY, nome VARCHAR(40))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS produtocategoria(asin VARCHAR(20), id_categoria INT, PRIMARY KEY (asin, id_categoria),FOREIGN KEY (asin) REFERENCES produto(asin));')
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+#parser(product,customer,reviews,categorias,similares,catsProds)
+criarTabela(product,customer,reviews,categorias,similares,catsProds)
