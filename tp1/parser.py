@@ -14,22 +14,11 @@ class Similar:
         self.asin = asin
         self.sAsin = sAsin
 
-class Grupo:
-    def __init__(self,nome):
-        self.nome = nome
-
 
 class Categorias:
-    def __init__(self,catpai_name,catpai_id,subcat_name,subcat_id):
-        self.catpai_name = catpai_name
-        self.catpai_id = catpai_id
-        self.subcat_name = subcat_name
-        self.subcat_id = subcat_id
-
-class Sub_prod:
-    def __init__(self,cat,asin):
-        self.cat = cat
-        self.asin = asin
+    def __init__(self,categoria_name,categoria_id):
+        self.categoria_name = categoria_name
+        self.categoria_id = categoria_id
 
 
 class Reviews:
@@ -39,7 +28,7 @@ class Reviews:
         self.customer_id = customer_id
         self.rating = rating
         self.votes = votes
-        self.helpf = helpful
+        self.helpful = helpful
 
 class CatsProducts():
     def __init__(self,val_id,val_asin):
@@ -85,10 +74,6 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
                 a = 0
                 while(a < x):
                     catsProdsList.append(CatsProducts(Lista2[a],asin))
-                    if(a > 0):
-                        categoriasList.append(Categorias(Lista[a-1],int(Lista2[a-1]),Lista[a],int(Lista2[a])))
-                    else:
-                        categoriasList.append(Categorias(Lista[a],int(Lista2[a]),Lista[a],int(Lista2[a])))
                     a+=1
                 i+=1
         x = 6 + catQt+1
@@ -117,28 +102,33 @@ catsProds = []
 
 
 
-def parser(prodList,customerList,rebiesList,categoriasList,similaresList,catsProdsList):
+def parser(prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList):
 
-    with open('ptest.txt', encoding='latin-1') as file:
+    with open('amazon-meta.txt', encoding='latin-1') as file:
         file_contents = file.read()
         file_split_by_id = file_contents.split('Id:   ',-1)
     
     i=1
     
     while(i < len(file_split_by_id)):
-        splitByLine(file_split_by_id[i],prodList,customerList,rebiesList,categoriasList,similaresList,catsProdsList)
+        splitByLine(file_split_by_id[i],prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList)
         i+=1
 
-    for i in range(len(catsProdsList)):
-        print("Cat ID:\t",catsProdsList[i].cat_id,"PROD asin:",catsProdsList[i].asin)
-
+    """
     for i in range(len(prodList)):
-        print("titulo:\t",prodList[i].title,"asin:\t",prodList[i].asin)
-
+        print("id:\t",prodList[i].id,"asin:\t",prodList[i].asin,"title:\t",prodList[i].title,'grupo:\t',prodList[i].group,'salesrank:\t',prodList[i].salesrank)
+    
     for i in range(len(similaresList)):
         print("asin:\t",similaresList[i].asin,"Sasin:\t",similaresList[i].sAsin)
 
+    for i in range(len(categoriasList)):
+        print("Cat name:\t",categoriasList[i].categoria_name,"Cat ID:\t",categoriasList[i].categoria_id)
 
+    for i in range(len(reviewsList)):
+        print("asin:\t",reviewsList[i].asin,"data:\t",reviewsList[i].date,"customer id:\t",reviewsList[i].customer_id,'rating:\t',reviewsList[i].rating,'votes:\t',reviewsList[i].votes,'helpful\t',reviewsList[i].helpful)
 
+    for i in range(len(catsProdsList)):
+        print("Cat ID:\t",catsProdsList[i].cat_id,"PROD asin:",catsProdsList[i].asin)
+    """
 
 parser(product,customer,reviews,categorias,similares,catsProds)
