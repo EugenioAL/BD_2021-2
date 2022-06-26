@@ -1,6 +1,3 @@
-from os import system
-import re
-from sys import stdin
 import psycopg2
 
 class Product:
