@@ -14,6 +14,9 @@ class Similar:
         self.asin = asin
         self.sAsin = sAsin
 
+    def __eq__(self, __o: object) -> bool:
+        return self.asin == __o.asin and self.sAsin == __o.sAsin
+
 
 class Categorias:
     def __init__(self,categoria_name,categoria_id):
@@ -72,10 +75,12 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
                 for f in range(len(Lista2)):
                     Lista2[f] = int(re.sub('\[\]','',Lista2[f]))
                 for idx in range(len(Lista)):
-                    categorias.append((Lista2[idx], Lista[idx]))
+                    categorias.add((Lista2[idx], Lista[idx]))
                 a = 0
                 while(a < x):
-                    catsProdsList.append(CatsProducts(Lista2[a],asin))
+                    if not catsProdsSet.intersection(set((Lista2[a],str(asin)))):
+                        catsProdsSet.add((Lista2[a],str(asin)))
+                        catsProdsList.append(CatsProducts(Lista2[a],asin))
                     a+=1
                 i+=1
         x = 6 + catQt+1
@@ -94,7 +99,7 @@ def splitByLine(dataText,productList,grupoList,reviewsList,categoriasList,simila
         productList.append(Product(id,asin,Lista[0],None,None))
 
 def parser(prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList):
-    filename = "sample.txt"
+    filename = "amazon-meta.txt"
     with open(filename, encoding='latin-1') as file:
         file_contents = file.read()
         file_split_by_id = file_contents.split('Id:   ',-1)
@@ -105,29 +110,13 @@ def parser(prodList,customerList,reviewsList,categoriasList,similaresList,catsPr
         splitByLine(file_split_by_id[i],prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList)
         i+=1
 
-    """
-    for i in range(len(prodList)):
-        print("id:\t",prodList[i].id,"asin:\t",prodList[i].asin,"title:\t",prodList[i].title,'grupo:\t',prodList[i].group,'salesrank:\t',prodList[i].salesrank)
-
-    for i in range(len(similaresList)):
-        print("asin:\t",similaresList[i].asin,"Sasin:\t",similaresList[i].sAsin)
-
-    for i in range(len(categoriasList)):
-        print("Cat name:\t",categoriasList[i].categoria_name,"Cat ID:\t",categoriasList[i].categoria_id)
-
-    for i in range(len(reviewsList)):
-        print("asin:\t",reviewsList[i].asin,"data:\t",reviewsList[i].date,"customer id:\t",reviewsList[i].customer_id,'rating:\t',reviewsList[i].rating,'votes:\t',reviewsList[i].votes,'helpful\t',reviewsList[i].helpful)
-
-    for i in range(len(catsProdsList)):
-        print("Cat ID:\t",catsProdsList[i].cat_id,"PROD asin:",catsProdsList[i].asin)
-    """
-
 
 product = []
 customer = []
 reviews = []
-categorias = []
+categorias = set()
 similares = []
+catsProdsSet = set()
 catsProds = []
 
 def get_connection():
@@ -148,9 +137,15 @@ def inserir_categorias(conn, list_categorias):
     cursor = conn.cursor()
     args = ','.join(cursor.mogrify("(%s,%s)", i).decode('utf-8')
                 for i in list_categorias)
-    cursor.execute("INSERT INTO categoria VALUES " + args)
+    cursor.execute("INSERT INTO categoria VALUES " + args + " ON CONFLICT (id) DO NOTHING")
     conn.commit()
+    conn.close()
     cursor.close()
+    # for cat in list_categorias:
+    #         postgres_insert_query = """ INSERT INTO categoria (id, nome) VALUES (%s,%s) ON CONFLICT (id) DO NOTHING """
+    #         record_to_insert = (cat[0], cat[1])
+    #         cursor.execute(postgres_insert_query, record_to_insert)
+    #         conn.commit()
 
 def inserir_produtos(conn, list_produtos):
     cursor = conn.cursor()
@@ -158,22 +153,25 @@ def inserir_produtos(conn, list_produtos):
                 for i in list_produtos)
     cursor.execute("INSERT INTO produto VALUES " + args)
     conn.commit()
+    conn.close()
     cursor.close()
 
-def inserir_avaliacoes(conn, list_reviews):
+def inserir_avaliacoes(conn, list_reviews: list):
     cursor = conn.cursor()
     args = ','.join(cursor.mogrify("(%s,%s,%s,%s,%s,%s)", i).decode('utf-8')
                 for i in list_reviews)
     cursor.execute("INSERT INTO review (asin, customer, rating, date, votes, helpful) VALUES " + args)
     conn.commit()
+    conn.close()
     cursor.close()
 
 def inserir_produto_categoria(conn, list_cats_prod):
     cursor = conn.cursor()
     args = ','.join(cursor.mogrify("(%s,%s)", i).decode('utf-8')
                 for i in list_cats_prod)
-    cursor.execute("INSERT INTO produtocategoria VALUES " + args)
+    cursor.execute("INSERT INTO produtocategoria VALUES " + args + " ON CONFLICT (asin, id_categoria) DO NOTHING")
     conn.commit()
+    conn.close()
     cursor.close()
 
 def inserir_similares(conn, list_similares):
@@ -182,28 +180,41 @@ def inserir_similares(conn, list_similares):
                 for i in list_similares)
     cursor.execute("INSERT INTO similares VALUES " + args)
     conn.commit()
+    conn.close()
     cursor.close()
 
 def criarTabela(conn):
     cursor = conn.cursor()
-    cursor.execute('CREATE TABLE IF NOT EXISTS produto(asin VARCHAR (20) PRIMARY KEY,id INT UNIQUE,title VARCHAR (100), salesrank INT,grupo VARCHAR(20));')
+    cursor.execute('CREATE TABLE IF NOT EXISTS produto(asin VARCHAR (20) PRIMARY KEY,id INT UNIQUE,title VARCHAR (500), salesrank INT,grupo VARCHAR(30));')
     cursor.execute('CREATE TABLE IF NOT EXISTS similares(asin VARCHAR(20),asin_sim VARCHAR(20),PRIMARY KEY (asin, asin_sim), FOREIGN KEY (asin) REFERENCES produto(asin))')
     cursor.execute('CREATE TABLE IF NOT EXISTS review(id SERIAL PRIMARY KEY,asin VARCHAR(20),customer VARCHAR(20),rating INT, date DATE, votes INT, helpful INT,FOREIGN KEY (asin) REFERENCES produto(asin))')
-    cursor.execute('CREATE TABLE IF NOT EXISTS categoria(id INT PRIMARY KEY, nome VARCHAR(40))')
+    cursor.execute('CREATE TABLE IF NOT EXISTS categoria(id INT PRIMARY KEY, nome VARCHAR(150))')
     cursor.execute('CREATE TABLE IF NOT EXISTS produtocategoria(asin VARCHAR(20), id_categoria INT, PRIMARY KEY (asin, id_categoria),FOREIGN KEY (asin) REFERENCES produto(asin));')
     conn.commit()
+    conn.close()
     cursor.close()
 
 parser(product,customer,reviews,categorias,similares,catsProds)
-conn = get_connection()
-criarTabela(conn)
-inserir_categorias(conn, list(set(categorias)))
 
-inserir_produtos(conn, [(produto.asin, produto.id, produto.title, produto.salesrank, produto.group) for produto in product])
+criarTabela(get_connection())
 
-inserir_avaliacoes(conn, [(r.asin, r.customer_id, r.rating, r.date, r.votes, r.helpful) for r in reviews])
+print("inserindo categorias...")
+inserir_categorias(get_connection(), list(categorias))
 
-inserir_produto_categoria(conn, list(set([(c.asin, c.cat_id) for c in catsProds])))
+print("inserindo produtos...")
+inserir_produtos(get_connection(), [(produto.asin, produto.id, produto.title, produto.salesrank, produto.group) for produto in product])
 
-inserir_similares(conn, [(s.asin, s.sAsin) for s in similares])
-conn.close()
+
+print("inserindo avalicacoes...")
+int_reviews = intervalos = [intervalo for intervalo in range(0, len(reviews), 5_000)]
+for i in range(1, len(int_reviews)):
+    ini = int_reviews[i - 1]
+    fim = int_reviews[i]
+    if i == len(int_reviews) - 1:
+        fim = len(reviews)
+
+    inserir_avaliacoes(get_connection(), [(r.asin, r.customer_id, r.rating, r.date, r.votes, r.helpful) for r in reviews[ini:fim]])
+
+inserir_produto_categoria(get_connection(), list(set([(c.asin, c.cat_id) for c in catsProds])))
+
+inserir_similares(get_connection(), [(s.asin, s.sAsin) for s in similares])
