@@ -1,4 +1,5 @@
 import psycopg2
+import re
 
 class Product:
     def __init__(self,id,asin,title,group,salesrank):
@@ -183,7 +184,7 @@ def inserir_similares(conn, list_similares):
     conn.commit()
     cursor.close()
 
-def criarTabela(conn, prodList,customerList,reviewsList,categoriasList,similaresList,catsProdsList):
+def criarTabela(conn):
     cursor = conn.cursor()
     cursor.execute('CREATE TABLE IF NOT EXISTS produto(asin VARCHAR (20) PRIMARY KEY,id INT UNIQUE,title VARCHAR (100), salesrank INT,grupo VARCHAR(20));')
     cursor.execute('CREATE TABLE IF NOT EXISTS similares(asin VARCHAR(20),asin_sim VARCHAR(20),PRIMARY KEY (asin, asin_sim), FOREIGN KEY (asin) REFERENCES produto(asin))')
@@ -192,20 +193,17 @@ def criarTabela(conn, prodList,customerList,reviewsList,categoriasList,similares
     cursor.execute('CREATE TABLE IF NOT EXISTS produtocategoria(asin VARCHAR(20), id_categoria INT, PRIMARY KEY (asin, id_categoria),FOREIGN KEY (asin) REFERENCES produto(asin));')
     conn.commit()
     cursor.close()
-    conn.close()
-
-#parser(product,customer,reviews,categorias,similares,catsProds)
-criarTabela(product,customer,reviews,categorias,similares,catsProds)
 
 parser(product,customer,reviews,categorias,similares,catsProds)
 conn = get_connection()
-criarTabela(conn, product,customer,reviews,categorias,similares,catsProds)
-#inserir_categorias(conn, list(set(categorias)))
+criarTabela(conn)
+inserir_categorias(conn, list(set(categorias)))
 
-#inserir_produtos(conn, [(produto.asin, produto.id, produto.title, produto.salesrank, produto.group) for produto in product])
+inserir_produtos(conn, [(produto.asin, produto.id, produto.title, produto.salesrank, produto.group) for produto in product])
 
-#inserir_avaliacoes(conn, [(r.asin, r.customer_id, r.rating, r.date, r.votes, r.helpful) for r in reviews])
+inserir_avaliacoes(conn, [(r.asin, r.customer_id, r.rating, r.date, r.votes, r.helpful) for r in reviews])
 
-#inserir_produto_categoria(conn, list(set([(c.asin, c.cat_id) for c in catsProds])))
+inserir_produto_categoria(conn, list(set([(c.asin, c.cat_id) for c in catsProds])))
 
-#inserir_similares(conn, [(s.asin, s.sAsin) for s in similares])
+inserir_similares(conn, [(s.asin, s.sAsin) for s in similares])
+conn.close()
