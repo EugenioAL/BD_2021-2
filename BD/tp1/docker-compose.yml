@@ -1,0 +1,6 @@
+version: '3.4'
+services:
+  levirodrigues_raimundoneto_eugenioalves:
+    build: .
+    ports:
+      - "5432:5432"
