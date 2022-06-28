@@ -1,7 +1,7 @@
 from psycopg2 import connect
 
 def get_connection():
-    return connect("dbname=postgres user=postgres password=postgres host=0.0.0.0 port=5432")
+    return connect("dbname=postgres user=postgres password=postgres host=127.0.0.1 port=5432")
 
 def letra_a():
     print("asin: 0486220125")
@@ -184,11 +184,17 @@ def letra_g():
 
 def main():
     print("** consultas **")
+    print("Questão a):")
     letra_a()
+    print("Questão b):")
     letra_b()
+    print("Questão d):")
     letra_d()
+    print("Questão e):")
     letra_e()
+    print("Questão f):")
     letra_f()
+    print("Questão g):")
     letra_g()
 
 
