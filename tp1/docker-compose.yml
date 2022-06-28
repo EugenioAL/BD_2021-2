@@ -1,10 +1,6 @@
+version: '3.4'
 services:
-  database:
-    image: postgres
+  levirodrigues_raimundoneto_eugenioalves:
+    build: .
     ports:
-      - 5432:5432
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: amazon
+      - "5432:5432"
