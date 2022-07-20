@@ -158,4 +158,9 @@ artigo findrec(int key){//muito similar a de alocação.
     free(vetor);
     tmp.id = -1;//caso eu não ache a chave set o id para "-1" siginificando que nao achei.
     return tmp;
+
+    /*TODO
+    Tratar overflowno bucket
+
+    */
 }
